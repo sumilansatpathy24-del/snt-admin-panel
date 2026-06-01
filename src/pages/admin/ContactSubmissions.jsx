@@ -8,6 +8,7 @@ import {
   getContactSubmissions, deleteContactSubmission, 
   updateContactSubmissionStatus 
 } from '../../utils/storage';
+import { API_BASE_URL } from '../../config/api';
 
 export default function ContactSubmissions() {
   const [submissions, setSubmissions] = useState([]);
@@ -21,7 +22,7 @@ export default function ContactSubmissions() {
 
   const loadSubmissions = async () => {
     try {
-      const response = await fetch('/api/contact');
+      const response = await fetch(`${API_BASE_URL}/api/contact`);
       if (!response.ok) throw new Error('API failed');
       const data = await response.json();
       console.log('Contact submissions:', data);
@@ -63,7 +64,7 @@ export default function ContactSubmissions() {
   const handleMarkStatus = async (id, newStatus) => {
     try {
       const token = localStorage.getItem('adminToken') || 'admin-session-token-2026';
-      const res = await fetch(`/api/contact/${id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/contact/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -95,7 +96,7 @@ export default function ContactSubmissions() {
     if (confirm('Are you sure you want to delete this customer inquiry?')) {
       try {
         const token = localStorage.getItem('adminToken') || 'admin-session-token-2026';
-        const res = await fetch(`/api/contact/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/contact/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`

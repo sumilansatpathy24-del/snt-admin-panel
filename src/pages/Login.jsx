@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Lock, User, Eye, EyeOff, Loader2, AlertCircle, LogIn } from 'lucide-react';
 import { login } from '../utils/storage';
+import { API_BASE_URL } from '../config/api';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -19,13 +20,31 @@ export default function Login() {
       return;
     }
     setLoading(true);
-    await new Promise(r => setTimeout(r, 600));
-    const ok = login(form.username, form.password);
-    setLoading(false);
-    if (ok) {
-      navigate('/', { replace: true });
-    } else {
-      setError('Invalid credentials. Try admin / admin123');
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: form.username,
+          password: form.password
+        })
+      });
+      const data = await response.json();
+      setLoading(false);
+      
+      if (response.ok && data.success) {
+        localStorage.setItem('snt_admin_auth', JSON.stringify({ username: form.username, loggedInAt: Date.now() }));
+        localStorage.setItem('adminToken', data.token);
+        navigate('/', { replace: true });
+      } else {
+        setError(data.message || 'Invalid username or password.');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setLoading(false);
+      setError('Failed to connect to backend server.');
     }
   };
 

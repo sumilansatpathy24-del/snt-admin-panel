@@ -8,6 +8,7 @@ import {
   getMediaUploads, saveMediaUpload, deleteMediaUpload, 
   updateMediaUpload, uploadImage 
 } from '../../utils/storage';
+import { API_BASE_URL } from '../../config/api';
 
 const DEFAULT_CATEGORIES = [
   'Homepage Banner',
@@ -58,7 +59,7 @@ export default function MediaManager() {
 
   const loadMedia = async () => {
     try {
-      const response = await fetch('/api/gallery');
+      const response = await fetch(`${API_BASE_URL}/api/gallery`);
       if (!response.ok) {
         throw new Error('API failed');
       }
@@ -160,7 +161,7 @@ export default function MediaManager() {
       formData.append('category', category);
       formData.append('image', file);
 
-      const res = await fetch('/api/gallery/upload', {
+      const res = await fetch(`${API_BASE_URL}/api/gallery/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -221,7 +222,7 @@ export default function MediaManager() {
     if (confirm('Are you sure you want to delete this media file?')) {
       try {
         const token = localStorage.getItem('adminToken') || 'admin-session-token-2026';
-        const res = await fetch(`/api/gallery/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/gallery/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -508,7 +509,7 @@ export default function MediaManager() {
                     {/* Preview Image */}
                     <div className="h-44 w-full bg-slate-900 overflow-hidden relative">
                       <img 
-                        src={media.imageUrl} 
+                        src={media.imageUrl ? (media.imageUrl.startsWith('http') ? media.imageUrl : `${API_BASE_URL}${media.imageUrl}`) : ''} 
                         alt={media.title} 
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"

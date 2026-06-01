@@ -8,6 +8,7 @@ import {
   getCareerApplications, deleteCareerApplication, 
   updateCareerApplicationStatus 
 } from '../../utils/storage';
+import { API_BASE_URL } from '../../config/api';
 
 export default function CareerApplications() {
   const [applications, setApplications] = useState([]);
@@ -22,7 +23,7 @@ export default function CareerApplications() {
 
   const loadApplications = async () => {
     try {
-      const response = await fetch('/api/careers');
+      const response = await fetch(`${API_BASE_URL}/api/careers`);
       if (!response.ok) throw new Error('API failed');
       const data = await response.json();
       console.log('Career applications:', data);
@@ -56,7 +57,7 @@ export default function CareerApplications() {
   const handleUpdateStatus = async (id, newStatus) => {
     try {
       const token = localStorage.getItem('adminToken') || 'admin-session-token-2026';
-      const res = await fetch(`/api/careers/${id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/careers/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +87,7 @@ export default function CareerApplications() {
     if (confirm('Are you sure you want to delete this career application?')) {
       try {
         const token = localStorage.getItem('adminToken') || 'admin-session-token-2026';
-        const res = await fetch(`/api/careers/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/careers/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -408,7 +409,7 @@ export default function CareerApplications() {
 
                     {/* Native Clickable File Download Link */}
                     <a
-                      href={selectedApp.resumeUrl}
+                      href={selectedApp.resumeUrl ? (selectedApp.resumeUrl.startsWith('http') ? selectedApp.resumeUrl : `${API_BASE_URL}${selectedApp.resumeUrl}`) : '#'}
                       target="_blank"
                       rel="noopener noreferrer"
                       download={selectedApp.resumeName || 'Resume.pdf'}
